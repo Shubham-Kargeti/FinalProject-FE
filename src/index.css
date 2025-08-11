@@ -25,6 +25,9 @@ a:hover {
 body {
   margin: 0;
   display: flex;
+  place-items: center; /* works for vertical align */
+  justify-content: center; /* center horizontally */
+  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
