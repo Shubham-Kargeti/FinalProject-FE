@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "./Dashboard.css";
+import "../CSS/Dashboard.css";
 import AdminPanel from "./AdminPanel";
 
 
@@ -54,6 +54,17 @@ function Dashboard() {
       alert("Admins cannot submit claims.");
       return;
     }
+
+    if (
+      !newClaim.type.trim() ||
+      !newClaim.requested_amount ||
+      !newClaim.description.trim()
+    ) {
+      alert("Please fill in all fields before submitting.");
+      return;
+    }
+
+
     try {
       const payload = {
         ...newClaim,
@@ -96,7 +107,7 @@ function Dashboard() {
     try {
       let url = `${API_BASE}/claims/${id}`;
       let payload = {};
-      
+
       if (user.role === "admin") {
         // Admin updates only status and approved_amount on admin route
         url = `${API_BASE}/admin/claims/${id}`;
@@ -155,7 +166,7 @@ function Dashboard() {
       <h1 className="dashboard-title">Welcome, {user.username}</h1>
 
       {/* Show Admin Panel for admins only */}
-    {user?.role === "admin" && <AdminPanel />}
+      {user?.role === "admin" && <AdminPanel />}
 
       {user.role !== "admin" && (
         <div className="card">
@@ -166,18 +177,21 @@ function Dashboard() {
               placeholder="Type"
               value={newClaim.type}
               onChange={(e) => setNewClaim({ ...newClaim, type: e.target.value })}
+              required
             />
             <input
               type="number"
               placeholder="Requested Amount"
               value={newClaim.requested_amount}
               onChange={(e) => setNewClaim({ ...newClaim, requested_amount: e.target.value })}
+              required
             />
             <input
               type="text"
               placeholder="Description"
               value={newClaim.description}
               onChange={(e) => setNewClaim({ ...newClaim, description: e.target.value })}
+              required
             />
             <button className="btn primary" onClick={handleSubmitClaim}>
               Submit
@@ -206,132 +220,139 @@ function Dashboard() {
 
       <div className="card">
         <h2>All Claims</h2>
-        <table className="claims-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Type</th>
-              <th>Requested Amount</th>
-              <th>Approved Amount</th>
-              <th>Description</th>
-              <th>Status</th>
-              <th>User ID</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {claims.length > 0 ? (
-              claims.map((claim) => (
-                <tr key={claim.id}>
-                  <td>{claim.id}</td>
-                  <td>
-                    {editClaimId === claim.id ? (
-                      <input
-                        type="text"
-                        value={editClaimData.type || ""}
-                        onChange={(e) => setEditClaimData({ ...editClaimData, type: e.target.value })}
-                      />
-                    ) : (
-                      claim.type
-                    )}
-                  </td>
-                  <td>
-                    {editClaimId === claim.id ? (
-                      <input
-                        type="number"
-                        value={editClaimData.requested_amount || ""}
-                        onChange={(e) =>
-                          setEditClaimData({ ...editClaimData, requested_amount: e.target.value })
-                        }
-                      />
-                    ) : (
-                      claim.requested_amount
-                    )}
-                  </td>
-                  <td>
-                    {user.role === "admin" && editClaimId === claim.id ? (
-                      <input
-                        type="number"
-                        value={editClaimData.approved_amount || ""}
-                        onChange={(e) =>
-                          setEditClaimData({ ...editClaimData, approved_amount: e.target.value })
-                        }
-                      />
-                    ) : (
-                      claim.approved_amount ?? ""
-                    )}
-                  </td>
-                  <td>
-                    {editClaimId === claim.id ? (
-                      <input
-                        type="text"
-                        value={editClaimData.description || ""}
-                        onChange={(e) =>
-                          setEditClaimData({ ...editClaimData, description: e.target.value })
-                        }
-                      />
-                    ) : (
-                      claim.description
-                    )}
-                  </td>
-                  <td>
-                    {user.role === "admin" && editClaimId === claim.id ? (
-                      <input
-                        type="text"
-                        value={editClaimData.status || ""}
-                        onChange={(e) =>
-                          setEditClaimData({ ...editClaimData, status: e.target.value })
-                        }
-                      />
-                    ) : (
-                      claim.status
-                    )}
-                  </td>
-                  <td>{claim.user_id}</td>
-                  <td>
-                    {editClaimId === claim.id ? (
-                      <>
-                        <button className="btn primary" onClick={() => handleUpdateClaim(claim.id)}>
-                          Save
-                        </button>
-                        <button
-                          className="btn secondary"
-                          onClick={() => {
-                            setEditClaimId(null);
-                            setEditClaimData({});
-                          }}
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          className="btn"
-                          onClick={() => {
-                            setEditClaimId(claim.id);
-                            setEditClaimData(claim);
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button className="btn danger" onClick={() => handleDeleteClaim(claim.id)}>
-                          Delete
-                        </button>
-                      </>
-                    )}
+
+        <div className="table-wrapper">
+
+          <table className="claims-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Requested Amount</th>
+                <th>Approved Amount</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>User ID</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {claims.length > 0 ? (
+                claims.map((claim) => (
+                  <tr key={claim.id}>
+                    <td>{claim.id}</td>
+                    <td>
+                      {editClaimId === claim.id ? (
+                        <input
+                          type="text"
+                          value={editClaimData.type || ""}
+                          onChange={(e) => setEditClaimData({ ...editClaimData, type: e.target.value })}
+                        />
+                      ) : (
+                        claim.type
+                      )}
+                    </td>
+                    <td>
+                      {editClaimId === claim.id ? (
+                        <input
+                          type="number"
+                          value={editClaimData.requested_amount || ""}
+                          onChange={(e) =>
+                            setEditClaimData({ ...editClaimData, requested_amount: e.target.value })
+                          }
+                        />
+                      ) : (
+                        claim.requested_amount
+                      )}
+                    </td>
+                    <td>
+                      {user.role === "admin" && editClaimId === claim.id ? (
+                        <input
+                          type="number"
+                          value={editClaimData.approved_amount || ""}
+                          onChange={(e) =>
+                            setEditClaimData({ ...editClaimData, approved_amount: e.target.value })
+                          }
+                        />
+                      ) : (
+                        claim.approved_amount ?? ""
+                      )}
+                    </td>
+                    <td>
+                      {editClaimId === claim.id ? (
+                        <input
+                          type="text"
+                          value={editClaimData.description || ""}
+                          onChange={(e) =>
+                            setEditClaimData({ ...editClaimData, description: e.target.value })
+                          }
+                        />
+                      ) : (
+                        claim.description
+                      )}
+                    </td>
+                    <td>
+                      {
+                        user.role === "admin" && editClaimId === claim.id ? (
+                          <select
+                            value={editClaimData.status || "pending"}
+                            onChange={(e) =>
+                              setEditClaimData({ ...editClaimData, status: e.target.value })
+                            }
+                          >
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                          </select>
+                        ) : (
+                          claim.status
+                        )}
+                    </td>
+                    <td>{claim.user_id}</td>
+                    <td>
+                      {editClaimId === claim.id ? (
+                        <>
+                          <button className="btn primary" onClick={() => handleUpdateClaim(claim.id)}>
+                            Save
+                          </button>
+                          <button
+                            className="btn secondary"
+                            onClick={() => {
+                              setEditClaimId(null);
+                              setEditClaimData({});
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            className="btn"
+                            onClick={() => {
+                              setEditClaimId(claim.id);
+                              setEditClaimData(claim);
+                            }}
+                          >
+                            Edit
+                          </button>
+                          <button className="btn danger" onClick={() => handleDeleteClaim(claim.id)}>
+                            Delete
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" style={{ textAlign: "center" }}>
+                    No claims to display
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="8" style={{ textAlign: "center" }}>
-                  No claims to display
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

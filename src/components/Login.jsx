@@ -1,6 +1,6 @@
 import { useState } from "react";
 import CreateUser from "./CreateUser";
-import "./Login.css";  // import the CSS file
+import "../CSS/Login.css";
 
 export default function Login({ onLogin }) {
   const [userId, setUserId] = useState("");
@@ -62,7 +62,7 @@ export default function Login({ onLogin }) {
           <button
             onClick={() => setShowCreateUser(true)}
             className="button"
-            style={{ backgroundColor: "#6c63ff" }}  // inline override for this one
+            style={{ backgroundColor: "#6c63ff" }} 
           >
             Create User
           </button>
